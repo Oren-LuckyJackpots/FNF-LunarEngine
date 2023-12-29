@@ -14,8 +14,10 @@ import flixel.math.FlxMath;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import flixel.tweens.FlxTween;
+import flixel.tweens.FlxEase;
 import lime.utils.Assets;
-import flixel.system.FlxSound;
+import flixel.sound.FlxSound;
+import openfl.Lib as Ass;
 import openfl.utils.Assets as OpenFlAssets;
 import WeekData;
 #if MODS_ALLOWED
@@ -27,6 +29,8 @@ using StringTools;
 class FreeplayState extends MusicBeatState
 {
 	var songs:Array<SongMetadata> = [];
+
+	var finishedFunnyMove:Bool = false;
 
 	var selector:FlxText;
 	private static var curSelected:Int = 0;
@@ -61,7 +65,8 @@ class FreeplayState extends MusicBeatState
 
 		#if desktop
 		// Updating Discord Rich Presence
-		DiscordClient.changePresence("In the Menus", null);
+		DiscordClient.changePresence("In the Freeplay Menu", null);
+		Ass.application.window.title = MainMenuState.windowName + 'Freeplay Menu';
 		#end
 
 		for (i in 0...WeekData.weeksList.length) {
@@ -111,23 +116,17 @@ class FreeplayState extends MusicBeatState
 
 		for (i in 0...songs.length)
 		{
-			var songText:Alphabet = new Alphabet(0, (70 * i) + 30, songs[i].songName, true, false);
+			var songText:Alphabet = new Alphabet(90, FlxG.height * 1.6, songs[i].songName, true);
 			songText.isMenuItem = true;
-			songText.targetY = i;
+			songText.targetY = i - curSelected;
 			grpSongs.add(songText);
 
-			if (songText.width > 980)
+			var maxWidth = 980;
+			if (songText.width > maxWidth)
 			{
-				var textScale:Float = 980 / songText.width;
-				songText.scale.x = textScale;
-				for (letter in songText.lettersArray)
-				{
-					letter.x *= textScale;
-					letter.offset.x *= textScale;
-				}
-				//songText.updateHitbox();
-				//trace(songs[i].songName + ' new scale: ' + textScale);
+				songText.scaleX = maxWidth / songText.width;
 			}
+			songText.snapToPosition();
 
 			Paths.currentModDirectory = songs[i].folder;
 			var icon:HealthIcon = new HealthIcon(songs[i].songCharacter);
@@ -140,6 +139,20 @@ class FreeplayState extends MusicBeatState
 			// songText.x += 40;
 			// DONT PUT X IN THE FIRST PARAMETER OF new ALPHABET() !!
 			// songText.screenCenter(X);
+			FlxTween.tween(songText, {y: 320}, 1 + (i * 0.25), {
+				ease: FlxEase.expoInOut,
+				onComplete: function(flxTween:FlxTween)
+				{
+					finishedFunnyMove = true;
+				}
+			});
+			FlxTween.tween(icon, {y: 320}, 1 + (i * 0.25), {
+				ease: FlxEase.expoInOut,
+				onComplete: function(flxTween:FlxTween)
+				{
+					finishedFunnyMove = true;
+				}
+			});
 		}
 		WeekData.setDirectoryFromWeek();
 
@@ -433,6 +446,7 @@ class FreeplayState extends MusicBeatState
 
 	function changeSelection(change:Int = 0, playSound:Bool = true)
 	{
+		if (finishedFunnyMove) {
 		if(playSound) FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
 
 		curSelected += change;
@@ -441,6 +455,7 @@ class FreeplayState extends MusicBeatState
 			curSelected = songs.length - 1;
 		if (curSelected >= songs.length)
 			curSelected = 0;
+	    }
 			
 		var newColor:Int = songs[curSelected].color;
 		if(newColor != intendedColor) {
@@ -528,6 +543,7 @@ class FreeplayState extends MusicBeatState
 		{
 			curDifficulty = newPos;
 		}
+		Ass.application.window.title = MainMenuState.windowName + 'Freeplay Menu - Now selecting: ' + songs[curSelected].songName;
 	}
 
 	private function positionHighscore() {

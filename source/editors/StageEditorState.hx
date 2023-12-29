@@ -26,6 +26,7 @@ import flixel.addons.ui.FlxUITabMenu;
 import flixel.addons.ui.FlxUITooltip.FlxUITooltipStyle;
 import flixel.ui.FlxButton;
 import flixel.ui.FlxSpriteButton;
+import openfl.Lib;
 import openfl.net.FileReference;
 import openfl.events.Event;
 import openfl.events.IOErrorEvent;
@@ -211,7 +212,8 @@ class StageEditorState extends MusicBeatState
 
         #if desktop
         // Updating Discord Rich Presence
-        DiscordClient.changePresence("In Stage Editor", "Making a stage...");
+        DiscordClient.changePresence("In the Stage Editor", "Making a stage...");
+        Lib.application.window.title = MainMenuState.windowName + 'Stage Editor (From OS Engine)';
         #end
 
         super.create();

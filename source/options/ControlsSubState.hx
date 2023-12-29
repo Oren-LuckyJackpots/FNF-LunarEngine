@@ -23,12 +23,13 @@ import flixel.tweens.FlxTween;
 import flixel.util.FlxTimer;
 import flixel.input.keyboard.FlxKey;
 import flixel.graphics.FlxGraphic;
+import openfl.Lib;
 import Controls;
 
 using StringTools;
 
 class ControlsSubState extends MusicBeatSubstate {
-	private static var curSelected:Int = -1;
+	private static var curSelected:Int = 1;
 	private static var curAlt:Bool = false;
 
 	private static var defaultKey:String = 'Reset to Default Keys';
@@ -67,9 +68,20 @@ class ControlsSubState extends MusicBeatSubstate {
 	private var grpInputsAlt:Array<AttachedText> = [];
 	var rebindingKey:Bool = false;
 	var nextAccept:Int = 5;
+	var title:String;
+	var rpcTitle:String;
+	var optionText:Alphabet;
 
 	public function new() {
 		super();
+
+		if(title == null) title = 'Controls';
+		if(rpcTitle == null) rpcTitle = 'Controls Menu';
+
+		#if desktop
+		DiscordClient.changePresence(rpcTitle, null);
+		Lib.application.window.title = MainMenuState.windowName + 'Options Menu - ' + rpcTitle;
+		#end
 
 		var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
 		bg.color = 0xFFea71fd;
@@ -90,17 +102,17 @@ class ControlsSubState extends MusicBeatSubstate {
 				isCentered = true;
 			}
 
-			var optionText:Alphabet = new Alphabet(0, (10 * i), optionShit[i][0], (!isCentered || isDefaultKey), false);
+			optionText = new Alphabet(200, 300, optionShit[i][0], (!isCentered || isDefaultKey));
 			optionText.isMenuItem = true;
 			if(isCentered) {
 				optionText.screenCenter(X);
-				optionText.forceX = optionText.x;
-				optionText.yAdd = -55;
-			} else {
-				optionText.forceX = 200;
+				optionText.y -= 55;
+				optionText.startPosition.y -= 55;
 			}
-			optionText.yMult = 60;
-			optionText.targetY = i;
+			optionText.changeX = false;
+			optionText.distancePerItem.y = 60;
+			optionText.targetY = i - curSelected;
+			optionText.snapToPosition();
 			grpOptions.add(optionText);
 
 			if(!isCentered) {
@@ -109,6 +121,13 @@ class ControlsSubState extends MusicBeatSubstate {
 				if(curSelected < 0) curSelected = i;
 			}
 		}
+		FlxTween.tween(optionText, {alpha: 1}, 1, {ease: FlxEase.backInOut, type: ONESHOT});
+		var titleText:Alphabet = new Alphabet(75, 40, title, true);
+		titleText.scaleX = 0.6;
+		titleText.scaleY = 0.6;
+		titleText.alpha = 0.4;
+		add(titleText);
+		FlxTween.tween(titleText, {alpha: 1}, 1, {ease: FlxEase.backInOut, type: ONESHOT});
 		changeSelection();
 	}
 

@@ -1,5 +1,6 @@
 package;
 
+import haxe.display.Protocol.InitializeResult;
 import flixel.FlxG;
 import flixel.input.FlxInput;
 import flixel.input.actions.FlxAction;
@@ -155,7 +156,27 @@ class Controls extends FlxActionSet
 	#end
 
 	public var gamepadsAdded:Array<Int> = [];
-	public var keyboardScheme = KeyboardScheme.None;
+	public var keyboardScheme = KeyboardScheme.None;public var keyboardBinds:Map<String, Array<FlxKey>>;
+	public function justPressed(key:String)
+	{
+		var result:Bool = (FlxG.keys.anyJustPressed(keyboardBinds[key]) == true);
+
+		return result == true;
+	}
+
+	public function pressed(key:String)
+	{
+		var result:Bool = (FlxG.keys.anyPressed(keyboardBinds[key]) == true);
+
+		return result == true;
+	}
+
+	public function justReleased(key:String)
+	{
+		var result:Bool = (FlxG.keys.anyJustReleased(keyboardBinds[key]) == true);
+
+		return result == true;
+	}
 
 	public var UI_UP(get, never):Bool;
 

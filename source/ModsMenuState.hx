@@ -2,6 +2,7 @@ package;
 
 #if desktop
 import Discord.DiscordClient;
+import openfl.Lib;
 #end
 import flash.text.TextField;
 import flixel.FlxG;
@@ -72,7 +73,8 @@ class ModsMenuState extends MusicBeatState
 
 		#if desktop
 		// Updating Discord Rich Presence
-		DiscordClient.changePresence("In the Menus", null);
+		DiscordClient.changePresence("In the Mods Menu", null);
+		Lib.application.window.title = MainMenuState.windowName + 'Mods Menu';
 		#end
 
 		bg = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
@@ -329,9 +331,10 @@ class ModsMenuState extends MusicBeatState
 			var newMod:ModMetadata = new ModMetadata(values[0]);
 			mods.push(newMod);
 
-			newMod.alphabet = new Alphabet(0, 0, mods[i].name, true, false, 0.05);
+			newMod.alphabet = new Alphabet(0, 0, mods[i].name, true);
 			var scale:Float = Math.min(840 / newMod.alphabet.width, 1);
-			newMod.alphabet = new Alphabet(0, 0, mods[i].name, true, false, 0.05, scale);
+			newMod.alphabet.scaleX = scale;
+			newMod.alphabet.scaleY = scale;
 			newMod.alphabet.y = i * 150;
 			newMod.alphabet.x = 310;
 			add(newMod.alphabet);
@@ -471,7 +474,7 @@ class ModsMenuState extends MusicBeatState
 			noModsTxt.alpha = 1 - Math.sin((Math.PI * noModsSine) / 180);
 		}
 
-		if((canExit && controls.BACK) || (canExit && FlxG.mouse.justPressedRight))
+		if(canExit && controls.BACK)
 		{
 			if(colorTween != null) {
 				colorTween.cancel();
@@ -498,12 +501,12 @@ class ModsMenuState extends MusicBeatState
 			}
 		}
 
-		if(controls.UI_UP_P || FlxG.mouse.wheel > 0)
+		if(controls.UI_UP_P)
 		{
 			changeSelection(-1);
 			FlxG.sound.play(Paths.sound('scrollMenu'));
 		}
-		if(controls.UI_DOWN_P || FlxG.mouse.wheel < 0)
+		if(controls.UI_DOWN_P)
 		{
 			changeSelection(1);
 			FlxG.sound.play(Paths.sound('scrollMenu'));
@@ -581,6 +584,7 @@ class ModsMenuState extends MusicBeatState
 			i++;
 		}
 		updateButtonToggle();
+		Lib.application.window.title = MainMenuState.windowName + 'Mods Menu - Now selecting: ' + modsList[curSelected];
 	}
 
 	function updatePosition(elapsed:Float = -1)

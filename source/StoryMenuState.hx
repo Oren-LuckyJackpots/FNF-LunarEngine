@@ -2,6 +2,7 @@ package;
 
 #if desktop
 import Discord.DiscordClient;
+import openfl.Lib;
 #end
 import flixel.FlxG;
 import flixel.FlxSprite;
@@ -90,7 +91,8 @@ class StoryMenuState extends MusicBeatState
 
 		#if desktop
 		// Updating Discord Rich Presence
-		DiscordClient.changePresence("In the Menus", null);
+		DiscordClient.changePresence("In the Story Menu", null);
+		Lib.application.window.title = MainMenuState.windowName + 'Story Menu';
 		#end
 
 		var num:Int = 0;
@@ -291,8 +293,13 @@ class StoryMenuState extends MusicBeatState
 
 				grpWeekText.members[curWeek].startFlashing();
 
-				var bf:MenuCharacter = grpWeekCharacters.members[1];
-				if(bf.character != '' && bf.hasConfirmAnimation) grpWeekCharacters.members[1].animation.play('confirm');
+				for (char in grpWeekCharacters.members)
+				{
+					if (char.character != '' && char.hasConfirmAnimation)
+					{
+						char.animation.play('confirm');
+					}
+				}
 				stopspamming = true;
 			}
 
@@ -444,6 +451,7 @@ class StoryMenuState extends MusicBeatState
 		{
 			curDifficulty = newPos;
 		}
+		Lib.application.window.title = MainMenuState.windowName + 'Story Menu - Now selecting: ' + loadedWeeks[curWeek].fileName;
 		updateText();
 	}
 

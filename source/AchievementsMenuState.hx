@@ -11,8 +11,11 @@ import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.math.FlxMath;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
+import flixel.tweens.FlxEase;
+import flixel.tweens.FlxTween;
 import lime.utils.Assets;
 import flixel.FlxSubState;
+import openfl.Lib;
 import Achievements;
 
 using StringTools;
@@ -25,11 +28,15 @@ class AchievementsMenuState extends MusicBeatState
 	private static var curSelected:Int = 0;
 	private var achievementArray:Array<AttachedAchievement> = [];
 	private var achievementIndex:Array<Int> = [];
+	var achieveName:String;
+	var icon:AttachedAchievement;
+	var optionText:Alphabet;
 	private var descText:FlxText;
 
 	override function create() {
 		#if desktop
-		DiscordClient.changePresence("Achievements Menu", null);
+		DiscordClient.changePresence("In the Achievements Menu", null);
+		Lib.application.window.title = MainMenuState.windowName + 'Awards Menu';
 		#end
 
 		var menuBG:FlxSprite = new FlxSprite().loadGraphic(Paths.image('menuBGBlue'));
@@ -51,19 +58,21 @@ class AchievementsMenuState extends MusicBeatState
 		}
 
 		for (i in 0...options.length) {
-			var achieveName:String = Achievements.achievementsStuff[achievementIndex[i]][2];
-			var optionText:Alphabet = new Alphabet(0, (100 * i) + 210, Achievements.isAchievementUnlocked(achieveName) ? Achievements.achievementsStuff[achievementIndex[i]][0] : '?', false, false);
+			achieveName = Achievements.achievementsStuff[achievementIndex[i]][2];
+			optionText = new Alphabet(280, 300, Achievements.isAchievementUnlocked(achieveName) ? Achievements.achievementsStuff[achievementIndex[i]][0] : '?', false);
 			optionText.isMenuItem = true;
-			optionText.x += 280;
-			optionText.xAdd = 200;
-			optionText.targetY = i;
+			optionText.targetY = i - curSelected;
+			optionText.snapToPosition();
 			grpOptions.add(optionText);
 
-			var icon:AttachedAchievement = new AttachedAchievement(optionText.x - 105, optionText.y, achieveName);
+			icon = new AttachedAchievement(optionText.x - 105, optionText.y, achieveName);
 			icon.sprTracker = optionText;
 			achievementArray.push(icon);
 			add(icon);
 		}
+		FlxTween.tween(achieveName, {alpha: 1}, 1, {ease: FlxEase.backInOut, type: ONESHOT});
+		FlxTween.tween(optionText, {alpha: 1}, 1, {ease: FlxEase.backInOut, type: ONESHOT});
+		FlxTween.tween(icon, {alpha: 1}, 1, {ease: FlxEase.backInOut, type: ONESHOT});
 
 		descText = new FlxText(150, 600, 980, "", 32);
 		descText.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
@@ -71,6 +80,7 @@ class AchievementsMenuState extends MusicBeatState
 		descText.borderSize = 2.4;
 		add(descText);
 		changeSelection();
+		FlxTween.tween(descText, {alpha: 1}, 1, {ease: FlxEase.backInOut, type: ONESHOT});
 
 		super.create();
 	}

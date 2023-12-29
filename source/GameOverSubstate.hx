@@ -1,5 +1,9 @@
 package;
 
+#if desktop
+import Discord.DiscordClient;
+import openfl.Lib;
+#end
 import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.FlxSubState;
@@ -45,6 +49,12 @@ class GameOverSubstate extends MusicBeatSubstate
 	public function new(x:Float, y:Float, camX:Float, camY:Float)
 	{
 		super();
+
+		#if desktop
+		// Updating Discord Rich Presence
+		DiscordClient.changePresence("Game Over...", null);
+		Lib.application.window.title = MainMenuState.windowName + 'Game Over';
+		#end
 
 		PlayState.instance.setOnLuas('inGameOver', true);
 
